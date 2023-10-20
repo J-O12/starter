@@ -85,8 +85,8 @@ jobs:
           cd ./
           pipenv install --dev
 
-      # - name: Run serve
-      #   run: pipenv run serve
+      - name: Run serve
+        run: pipenv run serve
 
       - name: Run Build
         run: pipenv run build
