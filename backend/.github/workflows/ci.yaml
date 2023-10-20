@@ -1,0 +1,95 @@
+name: My Workflow
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.13
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: Install Dependencies
+        run: |
+          cd ./
+          pipenv install --dev      
+
+
+      # - name: show flake8 deploy --ignore-pipfile
+      #   run: pipenv show -f flake8
+
+      - name: Run Lint
+        run: pipenv run lint 
+        working-directory: ./
+
+      - name: Handle Lint Errors
+        if: failure()
+        run: echo "Lint failed."
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.13
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: Install Dependencies
+        run: |
+          cd ./
+          pipenv install --dev
+
+      - name: Run Tests
+        run: pipenv run test
+
+      - name: Handle Test Errors
+        if: failure()
+        run: echo "Tests failed. Please check and fix the issues."
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.13
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: Install Dependencies
+        run: |
+          cd ./
+          pipenv install --dev
+
+      # - name: Run serve
+      #   run: pipenv run serve
+
+      - name: Run Build
+        run: pipenv run build
+
+      - name: Run echo
+        run: echo "Done."
